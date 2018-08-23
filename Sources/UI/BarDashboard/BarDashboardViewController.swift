@@ -46,10 +46,14 @@ final class BarDashboardViewController: UIViewController, LifetimeTrackerViewabl
     private var state: State = .closed {
         didSet { clampDragOffset() }
     }
+
+    private var hideUntilNextIssueIsDetected = false
     
     fileprivate var dashboardViewModel = BarDashboardViewModel()
     @IBOutlet private var tableViewController: DashboardTableViewController?
     @IBOutlet private var summaryLabel: UILabel?
+    @IBOutlet private weak var headerView: UIView?
+
     public var edge: Edge = .bottom
     
     private let closedHeight: CGFloat = Constants.Layout.Dashboard.headerHeight
@@ -75,6 +79,10 @@ final class BarDashboardViewController: UIViewController, LifetimeTrackerViewabl
     
     func update(with vm: BarDashboardViewModel) {
         summaryLabel?.attributedText = vm.summary
+
+        if hideUntilNextIssueIsDetected && dashboardViewModel.leaksCount != vm.leaksCount {
+            view.isHidden = false
+        }
         
         dashboardViewModel = vm
         
@@ -163,20 +171,46 @@ final class BarDashboardViewController: UIViewController, LifetimeTrackerViewabl
     }
     
     // MARK: - Expand / collapse
-    
-    @IBAction private func expandTapped(_ sender: UIButton) {
+
+    func addTapGestureRecognizer() {
+        let tapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(headerTapped))
+        headerView?.addGestureRecognizer(tapGestureRecognizer)
+    }
+
+    @objc func headerTapped() {
         if state == .closed {
             offsetForCloseJumpBack = dragOffset
         }
         state = state.opposite
-        
+
         if state == .closed && offsetForCloseJumpBack == maximumYPosition {
             dragOffset = offsetForCloseJumpBack
         }
-        
+
         UIView.animateKeyframes(withDuration: Constants.Layout.animationDuration, delay: 0, options: [.beginFromCurrentState, .calculationModeCubicPaced] , animations: {
             self.relayout()
         }, completion: nil)
+    }
+
+    // MARK: - Settings
+
+    @IBAction private func settingsButtonTapped(_ sender: UIButton) {
+        let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
+        alert.addAction(UIAlertAction(title: "Hide options", style: .default, handler: { (action: UIAlertAction) in
+            let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
+            alert.addAction(UIAlertAction(title: "Hide until new issues are detected", style: .default, handler: { (action: UIAlertAction) in
+                self.view.isHidden = true
+                self.hideUntilNextIssueIsDetected = true
+            }))
+            alert.addAction(UIAlertAction(title: "Hide always", style: .default, handler: { (action: UIAlertAction) in
+                self.view.isHidden = true
+                self.hideUntilNextIssueIsDetected = false
+            }))
+            alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
+            self.present(alert, animated: true, completion: nil)
+        }))
+        alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
+        present(alert, animated: true, completion: nil)
     }
     
     // MARK: Panning

@@ -33,6 +33,8 @@ class CircularDashboardViewController: UIViewController, LifetimeTrackerViewable
 
     private var didInitializeRoundView = false
 
+    private var hideUntilNextIssueDetected = false
+
     private var dashboardViewModel = BarDashboardViewModel() {
         didSet {
             lifetimeTrackerListViewController?.update(dashboardViewModel: dashboardViewModel)
@@ -107,6 +109,10 @@ class CircularDashboardViewController: UIViewController, LifetimeTrackerViewable
         leaksCountLabel?.text = "\(vm.leaksCount)"
         leaksCountLabel?.textColor = vm.leaksCount == 0 ? .green : .red
         leaksTitleLabel?.text = vm.leaksCount == 1 ? "word.leak".lt_localized : "word.leaks".lt_localized
+
+        if hideUntilNextIssueDetected && dashboardViewModel.leaksCount != vm.leaksCount {
+            view.isHidden = false
+        }
 
         dashboardViewModel = vm
 
@@ -188,6 +194,11 @@ extension CircularDashboardViewController: PopoverViewControllerDelegate {
     func dismissPopoverViewController() {
         updatePopoverVisibility(to: .closed)
         UIApplication.shared.statusBarStyle = formerStatusBarStyle
+    }
+
+    func hideLifetimeTracker(untilNextIssueIsDetected: Bool) {
+        view.isHidden = true
+        hideUntilNextIssueDetected = untilNextIssueIsDetected
     }
 }
 
