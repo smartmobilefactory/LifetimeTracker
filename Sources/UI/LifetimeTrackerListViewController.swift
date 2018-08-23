@@ -13,7 +13,6 @@ protocol PopoverViewControllerDelegate: class {
     func hideLifetimeTracker(untilNextIssueIsDetected: Bool)
 }
 
-
 class LifetimeTrackerListViewController: UIViewController {
     
     weak var delegate: PopoverViewControllerDelegate?
