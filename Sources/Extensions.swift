@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import UIKit
 
 internal extension String {
 
@@ -15,5 +16,17 @@ internal extension String {
             return self
         }
         return NSLocalizedString(self, bundle: bundle, comment: self)
+    }
+}
+
+internal extension UIViewController {
+
+    func getTopLevelViewController() -> UIViewController {
+        var topViewController = self
+        while let topController = self.presentedViewController {
+            topViewController = topController
+        }
+
+        return topViewController
     }
 }

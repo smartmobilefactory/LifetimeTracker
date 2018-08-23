@@ -95,7 +95,7 @@ class CircularDashboardViewController: UIViewController, LifetimeTrackerViewable
     }
 
     @objc func showSettings() {
-        SettingsManager.showSettingsActionSheet(hideUntilNewIssuesHandler: { [weak self] in
+        SettingsManager.showSettingsActionSheet(on: UIApplication.shared.keyWindow?.rootViewController?.getTopLevelViewController(), hideUntilNewIssuesHandler: { [weak self] in
             self?.hideLifetimeTracker(untilNextIssueIsDetected: true)
         }, hideAlwaysHandler: { [weak self] in
             self?.hideLifetimeTracker(untilNextIssueIsDetected: false)

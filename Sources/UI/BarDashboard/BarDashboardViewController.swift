@@ -196,7 +196,7 @@ final class BarDashboardViewController: UIViewController, LifetimeTrackerViewabl
     // MARK: - Settings
 
     @IBAction private func settingsButtonTapped(_ sender: UIButton) {
-        SettingsManager.showSettingsActionSheet(hideUntilNewIssuesHandler: { [weak self] in
+        SettingsManager.showSettingsActionSheet(on: UIApplication.shared.keyWindow?.rootViewController?.getTopLevelViewController(), hideUntilNewIssuesHandler: { [weak self] in
             self?.view.isHidden = true
             self?.hideUntilNextIssueIsDetected = true
         }, hideAlwaysHandler: { [weak self] in

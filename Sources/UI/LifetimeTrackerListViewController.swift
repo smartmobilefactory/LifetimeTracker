@@ -31,7 +31,7 @@ class LifetimeTrackerListViewController: UIViewController {
     }
     
     @IBAction func settingsButtonPressed(_ sender: Any) {
-        SettingsManager.showSettingsActionSheet(hideUntilNewIssuesHandler: { [weak self] in
+        SettingsManager.showSettingsActionSheet(on: self,hideUntilNewIssuesHandler: { [weak self] in
             self?.delegate?.hideLifetimeTracker(untilNextIssueIsDetected: true)
             }, hideAlwaysHandler: { [weak self] in
             self?.delegate?.hideLifetimeTracker(untilNextIssueIsDetected: false)

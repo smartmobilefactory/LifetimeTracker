@@ -10,7 +10,7 @@ import UIKit
 
 struct SettingsManager {
 
-    static func showSettingsActionSheet(hideUntilNewIssuesHandler: @escaping () -> (), hideAlwaysHandler: @escaping () -> ()) {
+    static func showSettingsActionSheet(on viewController: UIViewController?, hideUntilNewIssuesHandler: @escaping () -> (), hideAlwaysHandler: @escaping () -> ()) {
         let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
         alert.addAction(UIAlertAction(title: "Hide options", style: .default, handler: { (action: UIAlertAction) in
             let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
@@ -21,9 +21,9 @@ struct SettingsManager {
                 hideAlwaysHandler()
             }))
             alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
-            UIApplication.shared.keyWindow?.rootViewController?.present(alert, animated: true, completion: nil)
+            viewController?.present(alert, animated: true, completion: nil)
         }))
         alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
-        UIApplication.shared.keyWindow?.rootViewController?.present(alert, animated: true, completion: nil)
+        viewController?.present(alert, animated: true, completion: nil)
     }
 }
