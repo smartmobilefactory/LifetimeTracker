@@ -31,20 +31,11 @@ class LifetimeTrackerListViewController: UIViewController {
     }
     
     @IBAction func settingsButtonPressed(_ sender: Any) {
-        let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
-        alert.addAction(UIAlertAction(title: "Hide options", style: .default, handler: { (action: UIAlertAction) in
-            let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
-            alert.addAction(UIAlertAction(title: "Hide until new issues are detected", style: .default, handler: { (action: UIAlertAction) in
-                self.delegate?.hideLifetimeTracker(untilNextIssueIsDetected: true)
-            }))
-            alert.addAction(UIAlertAction(title: "Hide always", style: .default, handler: { (action: UIAlertAction) in
-                self.delegate?.hideLifetimeTracker(untilNextIssueIsDetected: false)
-            }))
-            alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
-            self.present(alert, animated: true, completion: nil)
-        }))
-        alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
-        present(alert, animated: true, completion: nil)
+        SettingsManager.showSettingsActionSheet(hideUntilNewIssuesHandler: { [weak self] in
+            self?.delegate?.hideLifetimeTracker(untilNextIssueIsDetected: true)
+            }, hideAlwaysHandler: { [weak self] in
+            self?.delegate?.hideLifetimeTracker(untilNextIssueIsDetected: false)
+        })
     }
 
     func update(dashboardViewModel: BarDashboardViewModel) {

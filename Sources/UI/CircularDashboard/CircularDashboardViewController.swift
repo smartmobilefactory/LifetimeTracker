@@ -53,6 +53,7 @@ class CircularDashboardViewController: UIViewController, LifetimeTrackerViewable
 
         addPanGestureRecognizer()
         addTapGestureRecognizer()
+        addLongPressGestureRecognizer()
 
         relayout()
     }
@@ -65,6 +66,11 @@ class CircularDashboardViewController: UIViewController, LifetimeTrackerViewable
     func addTapGestureRecognizer() {
         let tapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(showPopover))
         view.addGestureRecognizer(tapGestureRecognizer)
+    }
+
+    func addLongPressGestureRecognizer() {
+        let longPressGestureRecognizer = UILongPressGestureRecognizer(target: self, action: #selector(showSettings))
+        view.addGestureRecognizer(longPressGestureRecognizer)
     }
 
     var dragOffset = CGSize.zero {
@@ -86,6 +92,14 @@ class CircularDashboardViewController: UIViewController, LifetimeTrackerViewable
                 self.clampDragOffset()
             }, completion: nil)
         }
+    }
+
+    @objc func showSettings() {
+        SettingsManager.showSettingsActionSheet(hideUntilNewIssuesHandler: { [weak self] in
+            self?.hideLifetimeTracker(untilNextIssueIsDetected: true)
+        }, hideAlwaysHandler: { [weak self] in
+            self?.hideLifetimeTracker(untilNextIssueIsDetected: false)
+        })
     }
 
     func clampDragOffset() {
@@ -199,6 +213,7 @@ extension CircularDashboardViewController: PopoverViewControllerDelegate {
     func hideLifetimeTracker(untilNextIssueIsDetected: Bool) {
         view.isHidden = true
         hideUntilNextIssueDetected = untilNextIssueIsDetected
+        dismissPopoverViewController()
     }
 }
 
