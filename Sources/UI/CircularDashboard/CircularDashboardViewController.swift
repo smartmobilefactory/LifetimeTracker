@@ -213,7 +213,9 @@ extension CircularDashboardViewController: PopoverViewControllerDelegate {
     func hideLifetimeTracker(untilNextIssueIsDetected: Bool) {
         view.isHidden = true
         hideUntilNextIssueDetected = untilNextIssueIsDetected
-        dismissPopoverViewController()
+        if !popoverWindow.isHidden {
+            dismissPopoverViewController()
+        }
     }
 }
 

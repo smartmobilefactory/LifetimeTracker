@@ -68,7 +68,8 @@ final class BarDashboardViewController: UIViewController, LifetimeTrackerViewabl
         super.viewDidLoad()
         
         view.translatesAutoresizingMaskIntoConstraints = false
-        
+
+        addTapGestureRecognizer()
         addPanGestureRecognizer()
         dragOffset = maximumYPosition
     }
