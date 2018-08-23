@@ -94,12 +94,14 @@ class CircularDashboardViewController: UIViewController, LifetimeTrackerViewable
         }
     }
 
-    @objc func showSettings() {
-        SettingsManager.showSettingsActionSheet(on: UIApplication.topViewController(), hideUntilNewIssuesHandler: { [weak self] in
-            self?.hideLifetimeTracker(untilNextIssueIsDetected: true)
-        }, hideAlwaysHandler: { [weak self] in
-            self?.hideLifetimeTracker(untilNextIssueIsDetected: false)
-        })
+    @objc func showSettings(_ gestureRecognizer: UILongPressGestureRecognizer) {
+        if gestureRecognizer.state == .began {
+            SettingsManager.showSettingsActionSheet(on: UIApplication.topViewController(), hideUntilNewIssuesHandler: { [weak self] in
+                self?.hideLifetimeTracker(untilNextIssueIsDetected: true)
+            }, hideAlwaysHandler: { [weak self] in
+                self?.hideLifetimeTracker(untilNextIssueIsDetected: false)
+            })
+        }
     }
 
     func clampDragOffset() {
