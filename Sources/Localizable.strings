@@ -20,3 +20,10 @@
 
 "word.leaks" = "leaks";
 
+"settings.cancel" = "Cancel";
+
+"settings.option.hide" = "Hide options";
+
+"settings.option.hide.untilNew" = "Hide until new issues are detected";
+
+"settings.option.hide.always" = "Hide always";
