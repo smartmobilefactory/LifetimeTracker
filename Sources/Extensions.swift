@@ -19,14 +19,19 @@ internal extension String {
     }
 }
 
-internal extension UIViewController {
-
-    func getTopLevelViewController() -> UIViewController {
-        var topViewController = self
-        while let topController = self.presentedViewController {
-            topViewController = topController
+extension UIApplication {
+    class func topViewController(controller: UIViewController? = UIApplication.shared.keyWindow?.rootViewController) -> UIViewController? {
+        if let navigationController = controller as? UINavigationController {
+            return topViewController(controller: navigationController.visibleViewController)
         }
-
-        return topViewController
+        if let tabController = controller as? UITabBarController {
+            if let selected = tabController.selectedViewController {
+                return topViewController(controller: selected)
+            }
+        }
+        if let presented = controller?.presentedViewController {
+            return topViewController(controller: presented)
+        }
+        return controller
     }
 }
