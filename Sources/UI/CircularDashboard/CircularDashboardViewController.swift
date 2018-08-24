@@ -138,27 +138,27 @@ class CircularDashboardViewController: UIViewController, LifetimeTrackerViewable
         relayout()
     }
 
-    func showViewControllerIfNecessary(for viewModel: BarDashboardViewModel) {
+    private func showViewControllerIfNecessary(for viewModel: BarDashboardViewModel) {
         if let hideState = hideOption {
             switch hideState {
             case .untilNewIssue:
                 if dashboardViewModel.leaksCount != viewModel.leaksCount {
-                    view.isHidden = false
-                    hideOption = nil
+                    showViewController()
                 }
             case .untilNewIssueKind:
                 var oldGroupModelTitleSet =  Set<String>()
                 for oldGroupModel in dashboardViewModel.sections {
-                    if let oldGroupName = hideOption?.groupName(from: oldGroupModel.title) {
-                        oldGroupModelTitleSet.insert(oldGroupName)
-                    }
+                    oldGroupModelTitleSet.insert(oldGroupModel.groupName)
                 }
 
                 for newGroupModel in viewModel.sections {
-                    if let newGroupName = hideOption?.groupName(from: newGroupModel.title) {
-                        if !oldGroupModelTitleSet.contains(newGroupName) && newGroupModel.entries.count > newGroupModel.entries.capacity {
-                            view.isHidden = false
-                            hideOption = nil
+                    if !oldGroupModelTitleSet.contains(newGroupModel.groupName) && newGroupModel.entries.count > newGroupModel.entries.capacity {
+                        showViewController()
+                        return
+                    } else if let index = oldGroupModelTitleSet.index(of: newGroupModel.groupName){
+                        let oldGroupModel = dashboardViewModel.sections[oldGroupModelTitleSet.distance(from: oldGroupModelTitleSet.startIndex, to: index)]
+                        if oldGroupModel.groupCount<=oldGroupModel.groupMaxCount && newGroupModel.groupCount>newGroupModel.groupMaxCount {
+                            showViewController()
                             return
                         }
                     }
@@ -167,6 +167,11 @@ class CircularDashboardViewController: UIViewController, LifetimeTrackerViewable
                 break
             }
         }
+    }
+
+    private func showViewController() {
+        view.isHidden = false
+        hideOption = nil
     }
 
     private func relayout() {
