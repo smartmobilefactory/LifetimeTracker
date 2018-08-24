@@ -10,12 +10,15 @@ import UIKit
 
 struct SettingsManager {
 
-    static func showSettingsActionSheet(on viewController: UIViewController?, hideUntilNewIssuesHandler: @escaping () -> (), hideAlwaysHandler: @escaping () -> ()) {
-        let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
+    static func showSettingsActionSheet(on viewController: UIViewController?, hideUntilNewIssuesHandler: @escaping () -> (), hideUntilNewKindHandler: @escaping () -> (), hideAlwaysHandler: @escaping () -> ()) {
+        let alert = UIAlertController(title: "settings".lt_localized, message: nil, preferredStyle: .actionSheet)
         alert.addAction(UIAlertAction(title: "settings.option.hide".lt_localized, style: .default, handler: { (action: UIAlertAction) in
-            let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
-            alert.addAction(UIAlertAction(title: "settings.option.hide.untilNew".lt_localized, style: .default, handler: { (action: UIAlertAction) in
+            let alert = UIAlertController(title: "settings.option.hide".lt_localized, message: nil, preferredStyle: .actionSheet)
+            alert.addAction(UIAlertAction(title: "settings.option.hide.untilNewIssue".lt_localized, style: .default, handler: { (action: UIAlertAction) in
                 hideUntilNewIssuesHandler()
+            }))
+            alert.addAction(UIAlertAction(title: "settings.option.hide.untilNewKind".lt_localized, style: .default, handler: { (action: UIAlertAction) in
+                hideUntilNewKindHandler()
             }))
             alert.addAction(UIAlertAction(title: "settings.option.hide.always".lt_localized, style: .default, handler: { (action: UIAlertAction) in
                 hideAlwaysHandler()

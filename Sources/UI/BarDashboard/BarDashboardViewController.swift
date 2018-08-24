@@ -199,6 +199,9 @@ final class BarDashboardViewController: UIViewController, LifetimeTrackerViewabl
         SettingsManager.showSettingsActionSheet(on: UIApplication.topViewController(), hideUntilNewIssuesHandler: { [weak self] in
             self?.view.isHidden = true
             self?.hideUntilNextIssueIsDetected = true
+        }, hideUntilNewKindHandler: { [weak self] in
+            self?.view.isHidden = true
+            self?.hideUntilNextIssueIsDetected = true
         }, hideAlwaysHandler: { [weak self] in
             self?.view.isHidden = true
             self?.hideUntilNextIssueIsDetected = false

@@ -10,7 +10,7 @@ import UIKit
 
 protocol PopoverViewControllerDelegate: class {
     func dismissPopoverViewController()
-    func hideLifetimeTracker(untilNextIssueIsDetected: Bool)
+    func changeHideOption(for hideOption: UIViewController.HideOption)
 }
 
 class LifetimeTrackerListViewController: UIViewController {
@@ -30,10 +30,12 @@ class LifetimeTrackerListViewController: UIViewController {
     }
     
     @IBAction func settingsButtonPressed(_ sender: Any) {
-        SettingsManager.showSettingsActionSheet(on: self,hideUntilNewIssuesHandler: { [weak self] in
-            self?.delegate?.hideLifetimeTracker(untilNextIssueIsDetected: true)
-            }, hideAlwaysHandler: { [weak self] in
-            self?.delegate?.hideLifetimeTracker(untilNextIssueIsDetected: false)
+        SettingsManager.showSettingsActionSheet(on: self, hideUntilNewIssuesHandler: { [weak self] in
+            self?.delegate?.changeHideOption(for: .untilNewIssue)
+        }, hideUntilNewKindHandler: { [weak self] in
+            self?.delegate?.changeHideOption(for: .untilNewIssueKind)
+        }, hideAlwaysHandler: { [weak self] in
+            self?.delegate?.changeHideOption(for: .always)
         })
     }
 

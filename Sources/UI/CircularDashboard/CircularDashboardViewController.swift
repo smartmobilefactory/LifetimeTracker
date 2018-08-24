@@ -33,7 +33,11 @@ class CircularDashboardViewController: UIViewController, LifetimeTrackerViewable
 
     private var didInitializeRoundView = false
 
-    private var hideUntilNextIssueDetected = false
+    private var hideOption: HideOption? {
+        didSet {
+            view.isHidden = true
+        }
+    }
 
     private var dashboardViewModel = BarDashboardViewModel() {
         didSet {
@@ -97,9 +101,11 @@ class CircularDashboardViewController: UIViewController, LifetimeTrackerViewable
     @objc func showSettings(_ gestureRecognizer: UILongPressGestureRecognizer) {
         if gestureRecognizer.state == .began {
             SettingsManager.showSettingsActionSheet(on: UIApplication.topViewController(), hideUntilNewIssuesHandler: { [weak self] in
-                self?.hideLifetimeTracker(untilNextIssueIsDetected: true)
+                self?.changeHideOption(for: .untilNewIssue)
+            }, hideUntilNewKindHandler: { [weak self] in
+                self?.changeHideOption(for: .untilNewIssueKind)
             }, hideAlwaysHandler: { [weak self] in
-                self?.hideLifetimeTracker(untilNextIssueIsDetected: false)
+                self?.changeHideOption(for: .always)
             })
         }
     }
@@ -120,19 +126,41 @@ class CircularDashboardViewController: UIViewController, LifetimeTrackerViewable
         }
     }
 
-
     func update(with vm: BarDashboardViewModel) {
         leaksCountLabel?.text = "\(vm.leaksCount)"
         leaksCountLabel?.textColor = vm.leaksCount == 0 ? .green : .red
         leaksTitleLabel?.text = vm.leaksCount == 1 ? "word.leak".lt_localized : "word.leaks".lt_localized
 
-        if hideUntilNextIssueDetected && dashboardViewModel.leaksCount != vm.leaksCount {
-            view.isHidden = false
-        }
+        showViewControllerIfNecessary(for: vm)
 
         dashboardViewModel = vm
 
         relayout()
+    }
+
+    func showViewControllerIfNecessary(for viewModel: BarDashboardViewModel) {
+        if let hideState = hideOption {
+            switch hideState {
+            case .untilNewIssue:
+                if dashboardViewModel.leaksCount != viewModel.leaksCount {
+                    view.isHidden = false
+                }
+            case .untilNewIssueKind:
+                for newGroupModel in viewModel.sections {
+                    var oldGroupModelTitleSet =  Set<String>()
+                    for oldGroupModel in dashboardViewModel.sections {
+                        oldGroupModelTitleSet.insert(oldGroupModel.title)
+                    }
+
+                    if !oldGroupModelTitleSet.contains(newGroupModel.title) && newGroupModel.entries.count > newGroupModel.entries.capacity {
+                        view.isHidden = false
+                        break
+                    }
+                }
+            default:
+                break
+            }
+        }
     }
 
     private func relayout() {
@@ -212,9 +240,8 @@ extension CircularDashboardViewController: PopoverViewControllerDelegate {
         UIApplication.shared.statusBarStyle = formerStatusBarStyle
     }
 
-    func hideLifetimeTracker(untilNextIssueIsDetected: Bool) {
-        view.isHidden = true
-        hideUntilNextIssueDetected = untilNextIssueIsDetected
+    func changeHideOption(for hideOption: UIViewController.HideOption) {
+        self.hideOption = hideOption
         if !popoverWindow.isHidden {
             dismissPopoverViewController()
         }

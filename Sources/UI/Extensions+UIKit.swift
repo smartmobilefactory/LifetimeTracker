@@ -31,3 +31,12 @@ internal extension UIApplication {
         return controller
     }
 }
+
+internal extension UIViewController {
+
+    enum HideOption {
+        case untilNewIssue
+        case untilNewIssueKind
+        case always
+    }
+}

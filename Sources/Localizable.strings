@@ -20,10 +20,14 @@
 
 "word.leaks" = "leaks";
 
+"settings" = "Settings";
+
 "settings.cancel" = "Cancel";
 
 "settings.option.hide" = "Hide options";
 
-"settings.option.hide.untilNew" = "Hide until new issues are detected";
+"settings.option.hide.untilNewIssue" = "Until new issue is detected";
 
-"settings.option.hide.always" = "Hide always";
+"settings.optin.hide.untilNewKind" = "Until new kind of issue is detected";
+
+"settings.option.hide.always" = "Always";
