@@ -147,14 +147,14 @@ class CircularDashboardViewController: UIViewController, LifetimeTrackerViewable
                     hideOption = nil
                 }
             case .untilNewIssueKind:
-                for newGroupModel in viewModel.sections {
-                    var oldGroupModelTitleSet =  Set<String>()
-                    for oldGroupModel in dashboardViewModel.sections {
-                        if let oldGroupName = hideOption?.groupName(from: oldGroupModel.title) {
-                            oldGroupModelTitleSet.insert(oldGroupName)
-                        }
+                var oldGroupModelTitleSet =  Set<String>()
+                for oldGroupModel in dashboardViewModel.sections {
+                    if let oldGroupName = hideOption?.groupName(from: oldGroupModel.title) {
+                        oldGroupModelTitleSet.insert(oldGroupName)
                     }
+                }
 
+                for newGroupModel in viewModel.sections {
                     if let newGroupName = hideOption?.groupName(from: newGroupModel.title) {
                         if !oldGroupModelTitleSet.contains(newGroupName) && newGroupModel.entries.count > newGroupModel.entries.capacity {
                             view.isHidden = false
