@@ -35,7 +35,9 @@ class CircularDashboardViewController: UIViewController, LifetimeTrackerViewable
 
     private var hideOption: HideOption? {
         didSet {
-            view.isHidden = true
+            if hideOption != nil {
+                view.isHidden = true
+            }
         }
     }
 
@@ -155,8 +157,9 @@ class CircularDashboardViewController: UIViewController, LifetimeTrackerViewable
                     if !oldGroupModelTitleSet.contains(newGroupModel.groupName) && newGroupModel.entries.count > newGroupModel.entries.capacity {
                         showViewController()
                         return
-                    } else if let index = oldGroupModelTitleSet.index(of: newGroupModel.groupName){
-                        let oldGroupModel = dashboardViewModel.sections[oldGroupModelTitleSet.distance(from: oldGroupModelTitleSet.startIndex, to: index)]
+                    } else if let oldGroupModel = dashboardViewModel.sections.first(where: { (groupModel: GroupModel) -> Bool in
+                        groupModel.groupName == newGroupModel.groupName
+                    }) {
                         if oldGroupModel.groupCount<=oldGroupModel.groupMaxCount && newGroupModel.groupCount>newGroupModel.groupMaxCount {
                             showViewController()
                             return

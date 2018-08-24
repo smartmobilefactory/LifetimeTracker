@@ -47,7 +47,13 @@ final class BarDashboardViewController: UIViewController, LifetimeTrackerViewabl
         didSet { clampDragOffset() }
     }
 
-    private var hideUntilNextIssueIsDetected = false
+    private var hideOption: HideOption? {
+        didSet {
+            if hideOption != nil {
+                view.isHidden = true
+            }
+        }
+    }
     
     fileprivate var dashboardViewModel = BarDashboardViewModel()
     @IBOutlet private var tableViewController: DashboardTableViewController?
@@ -81,9 +87,7 @@ final class BarDashboardViewController: UIViewController, LifetimeTrackerViewabl
     func update(with vm: BarDashboardViewModel) {
         summaryLabel?.attributedText = vm.summary
 
-        if hideUntilNextIssueIsDetected && dashboardViewModel.leaksCount != vm.leaksCount {
-            view.isHidden = false
-        }
+        showViewControllerIfNecessary(for: vm)
         
         dashboardViewModel = vm
         
@@ -96,6 +100,43 @@ final class BarDashboardViewController: UIViewController, LifetimeTrackerViewabl
         }
         
         relayout()
+    }
+
+    private func showViewControllerIfNecessary(for viewModel: BarDashboardViewModel) {
+        if let hideState = hideOption {
+            switch hideState {
+            case .untilNewIssue:
+                if dashboardViewModel.leaksCount != viewModel.leaksCount {
+                    showViewController()
+                }
+            case .untilNewIssueKind:
+                var oldGroupModelTitleSet =  Set<String>()
+                for oldGroupModel in dashboardViewModel.sections {
+                    oldGroupModelTitleSet.insert(oldGroupModel.groupName)
+                }
+
+                for newGroupModel in viewModel.sections {
+                    if !oldGroupModelTitleSet.contains(newGroupModel.groupName) && newGroupModel.entries.count > newGroupModel.entries.capacity {
+                        showViewController()
+                        return
+                    } else if let oldGroupModel = dashboardViewModel.sections.first(where: { (groupModel: GroupModel) -> Bool in
+                        groupModel.groupName == newGroupModel.groupName
+                    }) {
+                        if oldGroupModel.groupCount<=oldGroupModel.groupMaxCount && newGroupModel.groupCount>newGroupModel.groupMaxCount {
+                            showViewController()
+                            return
+                        }
+                    }
+                }
+            default:
+                break
+            }
+        }
+    }
+
+    private func showViewController() {
+        view.isHidden = false
+        hideOption = nil
     }
     
     override func viewDidLayoutSubviews() {
@@ -197,15 +238,17 @@ final class BarDashboardViewController: UIViewController, LifetimeTrackerViewabl
 
     @IBAction private func settingsButtonTapped(_ sender: UIButton) {
         SettingsManager.showSettingsActionSheet(on: UIApplication.topViewController(), hideUntilNewIssuesHandler: { [weak self] in
-            self?.view.isHidden = true
-            self?.hideUntilNextIssueIsDetected = true
+            self?.updateHideOption(with: .untilNewIssue)
         }, hideUntilNewKindHandler: { [weak self] in
-            self?.view.isHidden = true
-            self?.hideUntilNextIssueIsDetected = true
+            self?.updateHideOption(with: .untilNewIssueKind)
         }, hideAlwaysHandler: { [weak self] in
-            self?.view.isHidden = true
-            self?.hideUntilNextIssueIsDetected = false
+            self?.updateHideOption(with: .always)
         })
+    }
+
+    private func updateHideOption(with hideOption: HideOption) {
+        self.hideOption = hideOption
+        view.isHidden = true
     }
     
     // MARK: Panning
