@@ -28,6 +28,6 @@
 
 "settings.option.hide.untilNewIssue" = "Until new issue is detected";
 
-"settings.optin.hide.untilNewKind" = "Until new kind of issue is detected";
+"settings.option.hide.untilNewKind" = "Until new kind of issue is detected";
 
 "settings.option.hide.always" = "Always";

@@ -38,5 +38,13 @@ internal extension UIViewController {
         case untilNewIssue
         case untilNewIssueKind
         case always
+
+        internal func groupName(from title: String) -> String? {
+            if let index = title.range(of: " ", options: .backwards, range: nil, locale: nil)?.lowerBound {
+                return String(title[..<index])
+            }
+
+            return nil
+        }
     }
 }
