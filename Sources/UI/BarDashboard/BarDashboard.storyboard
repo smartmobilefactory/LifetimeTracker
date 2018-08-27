@@ -147,6 +147,7 @@
                     <freeformSimulatedSizeMetrics key="simulatedDestinationMetrics"/>
                     <size key="freeformSize" width="375" height="128"/>
                     <connections>
+                        <outlet property="barView" destination="WeQ-Il-Fvf" id="fIH-oa-hWF"/>
                         <outlet property="headerView" destination="LTP-HG-KtQ" id="gho-M1-Tvp"/>
                         <outlet property="summaryLabel" destination="kui-Kg-jAG" id="tMy-Bj-KyM"/>
                         <outlet property="view" destination="MQx-KN-5jb" id="Q5z-EL-uGe"/>

@@ -10,7 +10,7 @@ import UIKit
 
 struct SettingsManager {
 
-    static func showSettingsActionSheet(on viewController: UIViewController?, hideUntilNewIssuesHandler: @escaping () -> (), hideUntilNewKindHandler: @escaping () -> (), hideAlwaysHandler: @escaping () -> ()) {
+    static func showSettingsActionSheet(on viewController: UIViewController?, hideUntilNewIssuesHandler: @escaping () -> (), hideUntilNewKindHandler: @escaping () -> (), hideAlwaysHandler: @escaping () -> (), cancelHandler: (() -> ())? = nil) {
         let alert = UIAlertController(title: "settings".lt_localized, message: nil, preferredStyle: .actionSheet)
         alert.addAction(UIAlertAction(title: "settings.option.hide".lt_localized, style: .default, handler: { (action: UIAlertAction) in
             let alert = UIAlertController(title: "settings.option.hide".lt_localized, message: nil, preferredStyle: .actionSheet)
@@ -23,7 +23,9 @@ struct SettingsManager {
             alert.addAction(UIAlertAction(title: "settings.option.hide.always".lt_localized, style: .default, handler: { (action: UIAlertAction) in
                 hideAlwaysHandler()
             }))
-            alert.addAction(UIAlertAction(title: "settings.cancel".lt_localized, style: .cancel, handler: nil))
+            alert.addAction(UIAlertAction(title: "settings.cancel".lt_localized, style: .cancel, handler: { (action: UIAlertAction) in
+                cancelHandler?()
+            }))
             viewController?.present(alert, animated: true, completion: nil)
         }))
         alert.addAction(UIAlertAction(title: "settings.cancel".lt_localized, style: .cancel, handler: nil))

@@ -102,12 +102,22 @@ class CircularDashboardViewController: UIViewController, LifetimeTrackerViewable
 
     @objc func showSettings(_ gestureRecognizer: UILongPressGestureRecognizer) {
         if gestureRecognizer.state == .began {
-            SettingsManager.showSettingsActionSheet(on: UIApplication.topViewController(), hideUntilNewIssuesHandler: { [weak self] in
+            guard let originalFrame = view.window?.frame else {
+                return
+            }
+            let roundViewFrame = roundView.frame
+            roundView.translatesAutoresizingMaskIntoConstraints = true
+            roundView.frame = CGRect(x: originalFrame.origin.x + roundViewFrame.origin.x, y: originalFrame.origin.y + roundViewFrame.origin.y, width: roundViewFrame.width, height: roundViewFrame.height)
+            view.window?.frame = CGRect(x: 0, y: 0, width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.height)
+            SettingsManager.showSettingsActionSheet(on: self, hideUntilNewIssuesHandler: { [weak self] in
                 self?.changeHideOption(for: .untilNewIssue)
             }, hideUntilNewKindHandler: { [weak self] in
                 self?.changeHideOption(for: .untilNewIssueKind)
             }, hideAlwaysHandler: { [weak self] in
                 self?.changeHideOption(for: .always)
+            }, cancelHandler: { [weak self] in
+                self?.roundView.translatesAutoresizingMaskIntoConstraints = false
+                self?.relayout()
             })
         }
     }

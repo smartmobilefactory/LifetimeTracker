@@ -11,7 +11,7 @@ struct BarDashboardViewModel {
     let leaksCount: Int
     let summary: NSAttributedString
     let sections: [GroupModel]
-    
+
     init(leaksCount: Int = 0, summary: NSAttributedString = NSAttributedString(), sections: [GroupModel] = []) {
         self.leaksCount = leaksCount
         self.summary = summary
@@ -24,7 +24,7 @@ final class BarDashboardViewController: UIViewController, LifetimeTrackerViewabl
     enum State {
         case open
         case closed
-        
+
         var opposite: State {
             switch self {
             case .open: return .closed
@@ -32,17 +32,17 @@ final class BarDashboardViewController: UIViewController, LifetimeTrackerViewabl
             }
         }
     }
-    
+
     enum Edge: Int {
         case top
         case bottom
     }
-    
+
     class func makeFromNib() -> UIViewController & LifetimeTrackerViewable {
         let storyboard = UIStoryboard(name: Constants.Storyboard.barDashbaord.name, bundle: Bundle(for: self))
         return storyboard.instantiateViewController(withIdentifier: String(describing: self)) as! BarDashboardViewController
     }
-    
+
     private var state: State = .closed {
         didSet { clampDragOffset() }
     }
@@ -54,14 +54,15 @@ final class BarDashboardViewController: UIViewController, LifetimeTrackerViewabl
             }
         }
     }
-    
+
     fileprivate var dashboardViewModel = BarDashboardViewModel()
     @IBOutlet private var tableViewController: DashboardTableViewController?
     @IBOutlet private var summaryLabel: UILabel?
+    @IBOutlet private weak var barView: UIView!
     @IBOutlet private weak var headerView: UIView?
 
     public var edge: Edge = .bottom
-    
+
     private let closedHeight: CGFloat = Constants.Layout.Dashboard.headerHeight
     private var originalOffset: CGFloat = 0
     private var dragOffset: CGFloat = 0 {
@@ -69,36 +70,37 @@ final class BarDashboardViewController: UIViewController, LifetimeTrackerViewabl
     }
     private var offsetForCloseJumpBack: CGFloat = 0
     private var currentScreenSize: CGSize = CGSize.zero
-    
+    private var fullScreen: Bool = false
+
     override func viewDidLoad() {
         super.viewDidLoad()
-        
+
         view.translatesAutoresizingMaskIntoConstraints = false
 
         addTapGestureRecognizer()
         addPanGestureRecognizer()
         dragOffset = maximumYPosition
     }
-    
+
     override var prefersStatusBarHidden: Bool {
         return false
     }
-    
+
     func update(with vm: BarDashboardViewModel) {
         summaryLabel?.attributedText = vm.summary
 
         showViewControllerIfNecessary(for: vm)
-        
+
         dashboardViewModel = vm
-        
+
         tableViewController?.update(dashboardViewModel: vm)
-        
+
         // Update the drag offset as the height might increase. The offset has to be decreased in this case
         if (dragOffset + heightToShow) > maximumHeight {
             dragOffset = maximumHeight - heightToShow
             offsetForCloseJumpBack = maximumHeight - closedHeight
         }
-        
+
         relayout()
     }
 
@@ -138,28 +140,28 @@ final class BarDashboardViewController: UIViewController, LifetimeTrackerViewabl
         view.isHidden = false
         hideOption = nil
     }
-    
+
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
-        
+
         if currentScreenSize != UIScreen.main.bounds.size {
             dragOffset = maximumYPosition
             offsetForCloseJumpBack = maximumHeight - closedHeight
         }
         currentScreenSize = UIScreen.main.bounds.size
-        
+
         relayout()
     }
-    
+
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if segue.identifier == Constants.Segue.embedDashboardTableView.identifier {
             tableViewController = segue.destination as? DashboardTableViewController
             tableViewController?.update(dashboardViewModel: dashboardViewModel)
         }
     }
-    
+
     // MARK: - Layout
-    
+
     private var heightToShow: CGFloat {
         var height = CGFloat(0)
         switch state {
@@ -170,7 +172,7 @@ final class BarDashboardViewController: UIViewController, LifetimeTrackerViewabl
         }
         return min(maximumHeight, height)
     }
-    
+
     private var minimumYPosition: CGFloat {
         if #available(iOS 11, *) {
             return view.safeAreaInsets.top
@@ -178,7 +180,7 @@ final class BarDashboardViewController: UIViewController, LifetimeTrackerViewabl
             return 0.0
         }
     }
-    
+
     private var maximumHeight: CGFloat {
         if #available(iOS 11, *) {
             return UIScreen.main.bounds.height - view.safeAreaInsets.top - view.safeAreaInsets.bottom
@@ -186,7 +188,7 @@ final class BarDashboardViewController: UIViewController, LifetimeTrackerViewabl
             return UIScreen.main.bounds.height
         }
     }
-    
+
     private var maximumYPosition: CGFloat {
         if #available(iOS 11, *) {
             return maximumHeight - heightToShow - view.safeAreaInsets.bottom + view.safeAreaInsets.top
@@ -194,24 +196,24 @@ final class BarDashboardViewController: UIViewController, LifetimeTrackerViewabl
             return maximumHeight - heightToShow
         }
     }
-    
+
     private var heightToFitTableView: CGFloat {
         let size = tableViewController?.contentSize ?? CGSize.zero
         return max(Constants.Layout.Dashboard.minTotalHeight, size.height + closedHeight)
     }
-    
+
     private var layoutWidth: CGFloat { return UIScreen.main.bounds.width }
-    
+
     private func relayout() {
         guard let window = view.window else { return }
-        
+
         // Prevent black areas during device orientation
         window.clipsToBounds = true
         window.translatesAutoresizingMaskIntoConstraints = true
-        window.frame = CGRect(x: 0, y: dragOffset, width: UIScreen.main.bounds.width, height: heightToShow)
+        window.frame = CGRect(x: 0, y: fullScreen ? 0 : dragOffset, width: UIScreen.main.bounds.width, height: fullScreen ? UIScreen.main.bounds.height : heightToShow)
         view.layoutIfNeeded()
     }
-    
+
     // MARK: - Expand / collapse
 
     func addTapGestureRecognizer() {
@@ -237,12 +239,24 @@ final class BarDashboardViewController: UIViewController, LifetimeTrackerViewabl
     // MARK: - Settings
 
     @IBAction private func settingsButtonTapped(_ sender: UIButton) {
-        SettingsManager.showSettingsActionSheet(on: UIApplication.topViewController(), hideUntilNewIssuesHandler: { [weak self] in
+        guard let originalWindowFrame = view.window?.frame.origin else {
+            return
+        }
+        let originalBarFrame = barView.frame
+        barView.translatesAutoresizingMaskIntoConstraints = true
+        barView.frame = CGRect(x: originalWindowFrame.x, y: originalWindowFrame.y, width: originalBarFrame.width, height: originalBarFrame.height)
+        fullScreen  = true
+        relayout()
+        SettingsManager.showSettingsActionSheet(on: self, hideUntilNewIssuesHandler: { [weak self] in
             self?.updateHideOption(with: .untilNewIssue)
         }, hideUntilNewKindHandler: { [weak self] in
             self?.updateHideOption(with: .untilNewIssueKind)
         }, hideAlwaysHandler: { [weak self] in
             self?.updateHideOption(with: .always)
+        }, cancelHandler: { [weak self] in
+            self?.barView.translatesAutoresizingMaskIntoConstraints = false
+            self?.fullScreen = false
+            self?.relayout()
         })
     }
 
@@ -250,14 +264,14 @@ final class BarDashboardViewController: UIViewController, LifetimeTrackerViewabl
         self.hideOption = hideOption
         view.isHidden = true
     }
-    
+
     // MARK: Panning
-    
+
     func addPanGestureRecognizer() {
         let panGestureRecognizer = UIPanGestureRecognizer(target: self, action: #selector(toolbarPanned))
         view.addGestureRecognizer(panGestureRecognizer)
     }
-    
+
     @objc func toolbarPanned(_ gestureRecognizer: UIPanGestureRecognizer) {
         switch gestureRecognizer.state {
         case .began:
@@ -272,7 +286,7 @@ final class BarDashboardViewController: UIViewController, LifetimeTrackerViewabl
         default: break
         }
     }
-    
+
     func clampDragOffset() {
         if dragOffset < minimumYPosition {
             dragOffset = minimumYPosition
