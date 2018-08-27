@@ -28,7 +28,9 @@ struct SettingsManager {
             }))
             viewController?.present(alert, animated: true, completion: nil)
         }))
-        alert.addAction(UIAlertAction(title: "settings.cancel".lt_localized, style: .cancel, handler: nil))
+        alert.addAction(UIAlertAction(title: "settings.cancel".lt_localized, style: .cancel, handler: { (action: UIAlertAction) in
+            cancelHandler?()
+        }))
         viewController?.present(alert, animated: true, completion: nil)
     }
 }
