@@ -115,7 +115,7 @@ class CircularDashboardViewController: UIViewController, LifetimeTrackerViewable
                 self?.changeHideOption(for: .untilNewIssueKind)
             }, hideAlwaysHandler: { [weak self] in
                 self?.changeHideOption(for: .always)
-            }, cancelHandler: { [weak self] in
+            }, callback: { [weak self] in
                 self?.roundView.translatesAutoresizingMaskIntoConstraints = false
                 self?.relayout()
             })

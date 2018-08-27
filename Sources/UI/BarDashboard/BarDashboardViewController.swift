@@ -253,7 +253,7 @@ final class BarDashboardViewController: UIViewController, LifetimeTrackerViewabl
             self?.updateHideOption(with: .untilNewIssueKind)
         }, hideAlwaysHandler: { [weak self] in
             self?.updateHideOption(with: .always)
-        }, cancelHandler: { [weak self] in
+        }, callback: { [weak self] in
             self?.barView.translatesAutoresizingMaskIntoConstraints = false
             self?.fullScreen = false
             self?.relayout()
