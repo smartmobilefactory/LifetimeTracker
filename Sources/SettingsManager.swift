@@ -14,11 +14,11 @@ struct SettingsManager {
         let alert = UIAlertController(title: "settings".lt_localized, message: nil, preferredStyle: .actionSheet)
         alert.addAction(UIAlertAction(title: "settings.option.hide".lt_localized, style: .default, handler: { (action: UIAlertAction) in
             let alert = UIAlertController(title: "settings.option.hide".lt_localized, message: nil, preferredStyle: .actionSheet)
-            alert.addAction(UIAlertAction(title: "settings.option.hide.untilNewIssue".lt_localized, style: .default, handler: { (action: UIAlertAction) in
-                completionHandler(.untilNewIssue)
+            alert.addAction(UIAlertAction(title: "settings.option.hide.untilMoreIssue".lt_localized, style: .default, handler: { (action: UIAlertAction) in
+                completionHandler(.untilMoreIssue)
             }))
-            alert.addAction(UIAlertAction(title: "settings.option.hide.untilNewKind".lt_localized, style: .default, handler: { (action: UIAlertAction) in
-                completionHandler(.untilNewIssueKind)
+            alert.addAction(UIAlertAction(title: "settings.option.hide.untilNewType".lt_localized, style: .default, handler: { (action: UIAlertAction) in
+                completionHandler(.untilNewIssueType)
             }))
             alert.addAction(UIAlertAction(title: "settings.option.hide.always".lt_localized, style: .default, handler: { (action: UIAlertAction) in
                 completionHandler(.always)

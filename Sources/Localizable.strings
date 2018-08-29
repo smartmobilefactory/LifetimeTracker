@@ -26,8 +26,8 @@
 
 "settings.option.hide" = "Hide";
 
-"settings.option.hide.untilNewIssue" = "Until more issues are detected";
+"settings.option.hide.untilMoreIssue" = "Until more issues are detected";
 
-"settings.option.hide.untilNewKind" = "Until new issue type is detected";
+"settings.option.hide.untilNewType" = "Until new issue type is detected";
 
 "settings.option.hide.always" = "Always";

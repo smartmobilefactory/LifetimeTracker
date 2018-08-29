@@ -7,19 +7,19 @@
 //
 
 enum HideOption {
-    case untilNewIssue
-    case untilNewIssueKind
+    case untilMoreIssue
+    case untilNewIssueType
     case always
     case none
 
     func newIssueDetected(oldModel: BarDashboardViewModel, newModel: BarDashboardViewModel) -> Bool {
         switch self {
-        case .untilNewIssue:
+        case .untilMoreIssue:
             if oldModel.leaksCount < newModel.leaksCount {
                 return true
             }
             return false
-        case .untilNewIssueKind:
+        case .untilNewIssueType:
             var oldGroupModelTitleSet =  Set<String>()
             for oldGroupModel in oldModel.sections {
                 oldGroupModelTitleSet.insert(oldGroupModel.groupName)
