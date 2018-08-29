@@ -47,9 +47,9 @@ final class BarDashboardViewController: UIViewController, LifetimeTrackerViewabl
         didSet { clampDragOffset() }
     }
 
-    private var hideOption: HideOption? {
+    private var hideOption: HideOption = .none {
         didSet {
-            if hideOption != nil {
+            if hideOption != .none {
                 view.isHidden = true
             }
         }
@@ -89,9 +89,9 @@ final class BarDashboardViewController: UIViewController, LifetimeTrackerViewabl
     func update(with vm: BarDashboardViewModel) {
         summaryLabel?.attributedText = vm.summary
 
-        if hideOption?.newIssueDetected(oldModel: dashboardViewModel, newModel: vm) == true {
+        if hideOption.newIssueDetected(oldModel: dashboardViewModel, newModel: vm) {
             view.isHidden = false
-            hideOption = nil
+            hideOption = .none
         }
 
         dashboardViewModel = vm
@@ -213,7 +213,7 @@ final class BarDashboardViewController: UIViewController, LifetimeTrackerViewabl
         barView.frame = CGRect(x: originalWindowFrame.x, y: originalWindowFrame.y, width: originalBarFrame.width, height: originalBarFrame.height)
         fullScreen  = true
         relayout()
-        SettingsManager.showSettingsActionSheet(on: self, completionHandler: { [weak self] (selectedOption: HideOption?) in
+        SettingsManager.showSettingsActionSheet(on: self, completionHandler: { [weak self] (selectedOption: HideOption) in
             self?.hideOption = selectedOption
             self?.barView.translatesAutoresizingMaskIntoConstraints = false
             self?.fullScreen = false

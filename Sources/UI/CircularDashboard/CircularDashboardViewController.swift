@@ -33,9 +33,9 @@ class CircularDashboardViewController: UIViewController, LifetimeTrackerViewable
 
     private var didInitializeRoundView = false
 
-    private var hideOption: HideOption? {
+    private var hideOption: HideOption = .none {
         didSet {
-            if hideOption != nil {
+            if hideOption != .none {
                 view.isHidden = true
             }
         }
@@ -109,7 +109,7 @@ class CircularDashboardViewController: UIViewController, LifetimeTrackerViewable
             roundView.translatesAutoresizingMaskIntoConstraints = true
             roundView.frame = CGRect(x: originalFrame.origin.x + roundViewFrame.origin.x, y: originalFrame.origin.y + roundViewFrame.origin.y, width: roundViewFrame.width, height: roundViewFrame.height)
             view.window?.frame = CGRect(x: 0, y: 0, width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.height)
-            SettingsManager.showSettingsActionSheet(on: self, completionHandler: { [weak self] (selecetedOption: HideOption?) in
+            SettingsManager.showSettingsActionSheet(on: self, completionHandler: { [weak self] (selecetedOption: HideOption) in
                 self?.changeHideOption(for: selecetedOption)
                 self?.roundView.translatesAutoresizingMaskIntoConstraints = false
                 self?.relayout()
@@ -138,9 +138,9 @@ class CircularDashboardViewController: UIViewController, LifetimeTrackerViewable
         leaksCountLabel?.textColor = vm.leaksCount == 0 ? .green : .red
         leaksTitleLabel?.text = vm.leaksCount == 1 ? "word.leak".lt_localized : "word.leaks".lt_localized
 
-        if hideOption?.newIssueDetected(oldModel: dashboardViewModel, newModel: vm) == true {
+        if hideOption.newIssueDetected(oldModel: dashboardViewModel, newModel: vm) {
             view.isHidden = false
-            hideOption = nil
+            hideOption = .none
         }
 
         dashboardViewModel = vm
@@ -225,7 +225,7 @@ extension CircularDashboardViewController: PopoverViewControllerDelegate {
         UIApplication.shared.statusBarStyle = formerStatusBarStyle
     }
 
-    func changeHideOption(for hideOption: UIViewController.HideOption?) {
+    func changeHideOption(for hideOption: HideOption) {
         self.hideOption = hideOption
         if !popoverWindow.isHidden {
             dismissPopoverViewController()
