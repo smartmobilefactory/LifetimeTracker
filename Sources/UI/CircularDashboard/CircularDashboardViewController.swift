@@ -138,48 +138,14 @@ class CircularDashboardViewController: UIViewController, LifetimeTrackerViewable
         leaksCountLabel?.textColor = vm.leaksCount == 0 ? .green : .red
         leaksTitleLabel?.text = vm.leaksCount == 1 ? "word.leak".lt_localized : "word.leaks".lt_localized
 
-        showViewControllerIfNecessary(for: vm)
+        if hideOption?.newIssueDetected(oldModel: dashboardViewModel, newModel: vm) == true {
+            view.isHidden = false
+            hideOption = nil
+        }
 
         dashboardViewModel = vm
 
         relayout()
-    }
-
-    private func showViewControllerIfNecessary(for viewModel: BarDashboardViewModel) {
-        if let hideState = hideOption {
-            switch hideState {
-            case .untilNewIssue:
-                if dashboardViewModel.leaksCount != viewModel.leaksCount {
-                    showViewController()
-                }
-            case .untilNewIssueKind:
-                var oldGroupModelTitleSet =  Set<String>()
-                for oldGroupModel in dashboardViewModel.sections {
-                    oldGroupModelTitleSet.insert(oldGroupModel.groupName)
-                }
-
-                for newGroupModel in viewModel.sections {
-                    if !oldGroupModelTitleSet.contains(newGroupModel.groupName) && newGroupModel.entries.count > newGroupModel.entries.capacity {
-                        showViewController()
-                        return
-                    } else if let oldGroupModel = dashboardViewModel.sections.first(where: { (groupModel: GroupModel) -> Bool in
-                        groupModel.groupName == newGroupModel.groupName
-                    }) {
-                        if oldGroupModel.groupCount<=oldGroupModel.groupMaxCount && newGroupModel.groupCount>newGroupModel.groupMaxCount {
-                            showViewController()
-                            return
-                        }
-                    }
-                }
-            default:
-                break
-            }
-        }
-    }
-
-    private func showViewController() {
-        view.isHidden = false
-        hideOption = nil
     }
 
     private func relayout() {
