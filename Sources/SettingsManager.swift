@@ -10,30 +10,27 @@ import UIKit
 
 struct SettingsManager {
 
-    static func showSettingsActionSheet(on viewController: UIViewController?, hideUntilNewIssuesHandler: @escaping () -> (), hideUntilNewKindHandler: @escaping () -> (), hideAlwaysHandler: @escaping () -> (), callback: (() -> ())? = nil) {
+	static func showSettingsActionSheet(on viewController: UIViewController, completionHandler: @escaping (UIViewController.HideOption?) -> Void) {
         let alert = UIAlertController(title: "settings".lt_localized, message: nil, preferredStyle: .actionSheet)
         alert.addAction(UIAlertAction(title: "settings.option.hide".lt_localized, style: .default, handler: { (action: UIAlertAction) in
             let alert = UIAlertController(title: "settings.option.hide".lt_localized, message: nil, preferredStyle: .actionSheet)
             alert.addAction(UIAlertAction(title: "settings.option.hide.untilNewIssue".lt_localized, style: .default, handler: { (action: UIAlertAction) in
-                callback?()
-                hideUntilNewIssuesHandler()
+                completionHandler(.untilNewIssue)
             }))
             alert.addAction(UIAlertAction(title: "settings.option.hide.untilNewKind".lt_localized, style: .default, handler: { (action: UIAlertAction) in
-                callback?()
-                hideUntilNewKindHandler()
+                completionHandler(.untilNewIssueKind)
             }))
             alert.addAction(UIAlertAction(title: "settings.option.hide.always".lt_localized, style: .default, handler: { (action: UIAlertAction) in
-                callback?()
-                hideAlwaysHandler()
+                completionHandler(.always)
             }))
             alert.addAction(UIAlertAction(title: "settings.cancel".lt_localized, style: .cancel, handler: { (action: UIAlertAction) in
-                callback?()
+                completionHandler(nil)
             }))
-            viewController?.present(alert, animated: true, completion: nil)
+            viewController.present(alert, animated: true, completion: nil)
         }))
         alert.addAction(UIAlertAction(title: "settings.cancel".lt_localized, style: .cancel, handler: { (action: UIAlertAction) in
-            callback?()
+            completionHandler(nil)
         }))
-        viewController?.present(alert, animated: true, completion: nil)
+        viewController.present(alert, animated: true, completion: nil)
     }
 }

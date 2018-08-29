@@ -247,22 +247,12 @@ final class BarDashboardViewController: UIViewController, LifetimeTrackerViewabl
         barView.frame = CGRect(x: originalWindowFrame.x, y: originalWindowFrame.y, width: originalBarFrame.width, height: originalBarFrame.height)
         fullScreen  = true
         relayout()
-        SettingsManager.showSettingsActionSheet(on: self, hideUntilNewIssuesHandler: { [weak self] in
-            self?.updateHideOption(with: .untilNewIssue)
-        }, hideUntilNewKindHandler: { [weak self] in
-            self?.updateHideOption(with: .untilNewIssueKind)
-        }, hideAlwaysHandler: { [weak self] in
-            self?.updateHideOption(with: .always)
-        }, callback: { [weak self] in
+        SettingsManager.showSettingsActionSheet(on: self, completionHandler: { [weak self] (selectedOption: HideOption?) in
+            self?.hideOption = selectedOption
             self?.barView.translatesAutoresizingMaskIntoConstraints = false
             self?.fullScreen = false
             self?.relayout()
         })
-    }
-
-    private func updateHideOption(with hideOption: HideOption) {
-        self.hideOption = hideOption
-        view.isHidden = true
     }
 
     // MARK: Panning

@@ -109,13 +109,8 @@ class CircularDashboardViewController: UIViewController, LifetimeTrackerViewable
             roundView.translatesAutoresizingMaskIntoConstraints = true
             roundView.frame = CGRect(x: originalFrame.origin.x + roundViewFrame.origin.x, y: originalFrame.origin.y + roundViewFrame.origin.y, width: roundViewFrame.width, height: roundViewFrame.height)
             view.window?.frame = CGRect(x: 0, y: 0, width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.height)
-            SettingsManager.showSettingsActionSheet(on: self, hideUntilNewIssuesHandler: { [weak self] in
-                self?.changeHideOption(for: .untilNewIssue)
-            }, hideUntilNewKindHandler: { [weak self] in
-                self?.changeHideOption(for: .untilNewIssueKind)
-            }, hideAlwaysHandler: { [weak self] in
-                self?.changeHideOption(for: .always)
-            }, callback: { [weak self] in
+            SettingsManager.showSettingsActionSheet(on: self, completionHandler: { [weak self] (selecetedOption: HideOption?) in
+                self?.changeHideOption(for: selecetedOption)
                 self?.roundView.translatesAutoresizingMaskIntoConstraints = false
                 self?.relayout()
             })
@@ -264,7 +259,7 @@ extension CircularDashboardViewController: PopoverViewControllerDelegate {
         UIApplication.shared.statusBarStyle = formerStatusBarStyle
     }
 
-    func changeHideOption(for hideOption: UIViewController.HideOption) {
+    func changeHideOption(for hideOption: UIViewController.HideOption?) {
         self.hideOption = hideOption
         if !popoverWindow.isHidden {
             dismissPopoverViewController()
