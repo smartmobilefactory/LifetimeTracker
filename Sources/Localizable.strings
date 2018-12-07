@@ -24,10 +24,12 @@
 
 "settings.cancel" = "Cancel";
 
-"settings.option.hide" = "Hide";
+"settings.hide.title" = "Hide LifetimeTracker";
 
-"settings.option.hide.untilMoreIssue" = "Until more issues are detected";
+"settings.hide.sheet.title" = "Hide until ...";
 
-"settings.option.hide.untilNewType" = "Until new issue types are detected";
+"settings.hide.sheet.untilMoreIssue" = "more issues are detected";
 
-"settings.option.hide.untilRestart" = "Until the app was restarted";
+"settings.hide.sheet.untilNewType" = "new issue types are detected";
+
+"settings.hide.sheet.untilRestart" = "the app was restarted";
