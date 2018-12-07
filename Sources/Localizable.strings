@@ -20,3 +20,14 @@
 
 "word.leaks" = "leaks";
 
+"settings" = "Settings";
+
+"settings.cancel" = "Cancel";
+
+"settings.option.hide" = "Hide";
+
+"settings.option.hide.untilMoreIssue" = "Until more issues are detected";
+
+"settings.option.hide.untilNewType" = "Until new issue types are detected";
+
+"settings.option.hide.untilRestart" = "Until the app was restarted";
